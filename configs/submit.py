@@ -2,7 +2,7 @@ from configs.default_config import cfg
 import os
 
 # common
-cfg.api_key = '6d00a89f0993898d2076fa151061ac5322cca71a'
+cfg.api_key = '1e2f64d1af3597c5a910968d7eeaa8ec360444ad'
 cfg.project = 'recsys-challenge-2023.lightgbm'
 cfg.user_name = 'Hyeonwoo'
 cfg.device = 'cuda' # 2
@@ -27,8 +27,12 @@ cfg.feat_frequency_encoding = False
 cfg.feat_frequency_encoding_7days = True
 cfg.feat_frequency_encoding_full_daysv3 = True 
 
+cfg.feat_count_preprocessing = True
+
 cfg.feat_f_42 = False
 cfg.feat_f_43 = False
+cfg.feat_f_56 = True 
+
 cfg.feat_f_2_4 = True 
 cfg.feat_f_4_6 = True 
 cfg.feat_f_3_15 = True
@@ -52,6 +56,7 @@ cfg.hyeon_click_target_encoding = False
 cfg.hyeon_click_cat_encoding = True
 cfg.hyeon_install_cat_encoding = True
 
+# cfg.delete_features = ["f_2", "f_4", "f_6"] # f_19, f_20, f_21, f_56, f_57, f_61, f_76
 cfg.categorical_features = ["f_2_count_full_7days", "f_3", "f_4_count_full_7days", "f_6_count_full_7days", "f_13_count_full_7days", "f_15_count_full_7days", "f_18_count_full_7days"]
 cfg.delete_features = ['f_4', 'f_12', 'f_7', 'f_7_count_full', 'f_9', 'f_11', 'f_43', 'f_51', 'f_58', 'f_59', 'f_64', 'f_65', 'f_66', 'f_67', 'f_68', 'f_69', 'f_70']
 
@@ -64,7 +69,7 @@ cfg.test_file = os.path.join(cfg.root_path, "test/test.parquet")
 cfg.label_col = "is_installed"
 cfg.stacking = False
 cfg.downcast = True
-cfg.use_train_valid = False # True면 성능 하락
+cfg.use_train_valid = True # True면 성능 하락
 
 cfg.params = {'num_leaves': 491,
           'min_child_weight': 0.03454472573214212,
@@ -77,6 +82,23 @@ cfg.params = {'num_leaves': 491,
           "boosting_type": "gbdt",
           "bagging_seed": 11,
           "metric": 'binary_logloss',
+          "verbosity": -1,
+          'reg_alpha': 0.3899927210061127,
+          'reg_lambda': 0.6485237330340494,
+          'random_state': 47
+         }
+
+cfg.params_full = {'num_leaves': 491,
+          'min_child_weight': 0.03454472573214212,
+          'feature_fraction': 0.3797454081646243,
+          'bagging_fraction': 0.4181193142567742,
+          'min_data_in_leaf': 106,
+          'objective': 'binary',
+          'max_depth': -1,
+          'learning_rate': 0.006883242363721497,
+          "boosting_type": "gbdt",
+          "bagging_seed": 11,
+          "metric": 'rmse',
           "verbosity": -1,
           'reg_alpha': 0.3899927210061127,
           'reg_lambda': 0.6485237330340494,
