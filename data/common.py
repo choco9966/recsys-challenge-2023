@@ -181,7 +181,7 @@ def get_features(
     if cfg.get('feat_frequency_encoding', False):
         # 저장해둔 피쳐 파일이 있으면 해당 파일을 불러와서 concat 하기 
         # train_feat.parquet, valid_feat.parquet, test_feat.parquet 
-        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data/feat/frequency"
+        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data_submit/feat/frequency"
         if not os.path.isfile(os.path.join(frequency_path, 'fe_trv2.parquet')):
             cols = [f"f_{c}" for c in [2,3,4,5,6,8,12,13,14,15,16,17,18,19,20,21,22,23,24,32]] # 9, 11넣고도 해보기 # if c not in [9, 11]
             for col in tqdm(cols, position=1, leave=False):
@@ -245,7 +245,7 @@ def get_features(
             train_df[f"feat_{col}"] = list(train_df[col].apply(lambda x: interval_to_label(x.right)).values)
 
     if cfg.get('feat_frequency_encoding_7days', False):
-        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data/feat/frequency_7days"
+        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data_submit/feat/frequency_7days"
         if not os.path.isfile(os.path.join(frequency_path, 'fe_trv2.parquet')):
             cols = [f"f_{c}" for c in [2, 4, 6, 13, 15, 18]] # 9, 11넣고도 해보기 # if c not in [9, 11]
             for col in tqdm(cols, position=1, leave=False):
@@ -264,6 +264,7 @@ def get_features(
                 fe = temp[col].value_counts(dropna=False) # 이거 먼저 오류 수정하고 내보기 
                 test_df.loc[:, f'{col}_count_full_7days'] = test_df.loc[:, col].map(fe) / (temp.shape[0])
 
+            os.makedirs(frequency_path, exist_ok=True)
             train_df[["f_0"] + [f"f_{c}_count_full_7days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_trv2.parquet'))
             valid_df[["f_0"] + [f"f_{c}_count_full_7days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_valv2.parquet'))
             test_df[["f_0"] + [f"f_{c}_count_full_7days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_tev2.parquet'))
@@ -277,7 +278,7 @@ def get_features(
             test_df = pd.merge(test_df, te_fe, how='left', on=["f_0"])
 
     if cfg.get('feat_frequency_encoding_full_days', False):
-        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data/feat/frequency_full_days"
+        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data_submit/feat/frequency_full_days"
         os.makedirs(frequency_path, exist_ok=True)
         if not os.path.isfile(os.path.join(frequency_path, 'fe_tr.parquet')):
             cols = [f"f_{c}" for c in [2, 4, 6, 13, 15, 18]] # 9, 11넣고도 해보기 # if c not in [9, 11]
@@ -297,6 +298,7 @@ def get_features(
                 fe = temp[col].value_counts(dropna=False) # 이거 먼저 오류 수정하고 내보기 
                 test_df.loc[:, f'{col}_count_full_days'] = test_df.loc[:, col].map(fe) / (temp.shape[0])
 
+            os.makedirs(frequency_path, exist_ok=True)
             train_df[["f_0"] + [f"f_{c}_count_full_days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_tr.parquet'))
             valid_df[["f_0"] + [f"f_{c}_count_full_days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_val.parquet'))
             test_df[["f_0"] + [f"f_{c}_count_full_days" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_te.parquet'))
@@ -310,7 +312,7 @@ def get_features(
             test_df = pd.merge(test_df, te_fe, how='left', on=["f_0"])
 
     if cfg.get('feat_frequency_encoding_full_daysv2', False):
-        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data/feat/frequency_full_daysv2"
+        frequency_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data_submit/feat/frequency_full_daysv2"
         os.makedirs(frequency_path, exist_ok=True)
         if not os.path.isfile(os.path.join(frequency_path, 'fe_tr.parquet')):
             cols = [f"f_{c}" for c in [2, 4, 6, 13, 15, 18]] # 9, 11넣고도 해보기 # if c not in [9, 11]
@@ -330,6 +332,7 @@ def get_features(
                 fe = temp[col].value_counts(dropna=False) # 이거 먼저 오류 수정하고 내보기 
                 test_df.loc[:, f'{col}_count_full_daysv2'] = test_df.loc[:, col].map(fe) / (temp.shape[0])
 
+            os.makedirs(frequency_path, exist_ok=True)
             train_df[["f_0"] + [f"f_{c}_count_full_daysv2" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_tr.parquet'))
             valid_df[["f_0"] + [f"f_{c}_count_full_daysv2" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_val.parquet'))
             test_df[["f_0"] + [f"f_{c}_count_full_daysv2" for c in [2, 4, 6, 13, 15, 18]]].to_parquet(os.path.join(frequency_path, 'fe_te.parquet'))
@@ -344,7 +347,6 @@ def get_features(
 
     if cfg.get('feat_frequency_encoding_full_daysv3', False):
         all_df = pd.concat([train_df, valid_df], axis=0)
-
         cols = [f"f_{c}" for c in [2,3,4,5,6,8,12,13,14,15,16,17,18,19,20,21,22,23,24,32]] # 9, 11넣고도 해보기 # if c not in [9, 11]
         for col in cols: 
             fe = all_df[col].value_counts()
