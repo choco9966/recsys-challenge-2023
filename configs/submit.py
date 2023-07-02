@@ -2,7 +2,7 @@ from configs.default_config import cfg
 import os
 
 # common
-cfg.api_key = '1e2f64d1af3597c5a910968d7eeaa8ec360444ad'
+cfg.api_key = ''
 cfg.project = 'recsys-challenge-2023.lightgbm'
 cfg.user_name = 'Hyeonwoo'
 cfg.device = 'cuda' # 2
@@ -62,13 +62,13 @@ cfg.delete_features = ['f_4', 'f_12', 'f_7', 'f_7_count_full', 'f_9', 'f_11', 'f
 # etc
 cfg.save_dir = 'results'
 cfg.save_file = 'submission.csv'
-cfg.root_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data/"
+cfg.root_path = "/data/project/recsys-challenge-2023/sharechat_recsys2023_data_submit/"
 cfg.train_file = os.path.join(cfg.root_path, "train/train.parquet")
 cfg.test_file = os.path.join(cfg.root_path, "test/test.parquet")
 cfg.label_col = "is_installed"
 cfg.stacking = False
 cfg.downcast = True
-cfg.use_train_valid = True # True면 성능 하락
+cfg.use_train_valid = False # True면 성능 하락
 
 cfg.params = {'num_leaves': 491,
           'min_child_weight': 0.03454472573214212,
