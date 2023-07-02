@@ -56,7 +56,6 @@ cfg.hyeon_click_target_encoding = False
 cfg.hyeon_click_cat_encoding = True
 cfg.hyeon_install_cat_encoding = True
 
-# cfg.delete_features = ["f_2", "f_4", "f_6"] # f_19, f_20, f_21, f_56, f_57, f_61, f_76
 cfg.categorical_features = ["f_2_count_full_7days", "f_3", "f_4_count_full_7days", "f_6_count_full_7days", "f_13_count_full_7days", "f_15_count_full_7days", "f_18_count_full_7days"]
 cfg.delete_features = ['f_4', 'f_12', 'f_7', 'f_7_count_full', 'f_9', 'f_11', 'f_43', 'f_51', 'f_58', 'f_59', 'f_64', 'f_65', 'f_66', 'f_67', 'f_68', 'f_69', 'f_70']
 
