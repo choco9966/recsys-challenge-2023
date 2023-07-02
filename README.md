@@ -1,5 +1,19 @@
 # challenges-recsys-challenge-2023
 
+## Dataset Schema 
+```
+├── configs
+│   ├── default_config.py
+│   └── submit.py
+├── data
+│   └── common.py
+├── models
+│   └── common.py
+├── preprocess.py
+├── run.py
+├── README.md
+└── requirements.txt
+```
 
 ## Preprocess
 ```python preprocess.py --config submit```
@@ -14,6 +28,7 @@ Format all csv files to one parquet file.
 
 ## Train & Inference 
 ```python run.py --config submit --no_wandb --verbose```
+
 - Input 
     - train.parquet
     - test.parquet 
