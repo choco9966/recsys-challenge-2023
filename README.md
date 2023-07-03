@@ -1,4 +1,4 @@
-# challenges-recsys-challenge-2023
+# recsys-challenge-2023
 
 ## Dataset Schema 
 ```
