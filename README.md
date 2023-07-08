@@ -5,9 +5,9 @@
 ├── configs
 │   ├── default_config.py
 │   └── submit.py
-├── imgs
 ├── data
 │   └── common.py
+├── imgs
 ├── models
 │   └── common.py
 ├── README.md
