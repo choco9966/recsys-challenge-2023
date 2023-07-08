@@ -37,7 +37,10 @@ Format all csv files to one parquet file.
     - config.py 
     - feature_importance.png 
 
-## Solution Summary 
+## Solution Summary
+
+![]("./imgs/overview.png)
+
 - Preprocessing
     - count preprocessing : Divide into the second smallest value.
     - remove features : Using Adversarial Validation (Remove Train-Test gap features)
