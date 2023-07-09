@@ -7,6 +7,7 @@
 │   └── submit.py
 ├── data
 │   └── common.py
+├── imgs
 ├── models
 │   └── common.py
 ├── README.md
@@ -39,7 +40,7 @@ Format all csv files to one parquet file.
 
 ## Solution Summary
 
-![]("./imgs/overview.png")
+![](./imgs/overview.png)
 
 - Preprocessing
     - count preprocessing : Divide into the second smallest value.
