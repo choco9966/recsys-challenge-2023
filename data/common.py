@@ -80,7 +80,6 @@ def train_valid_split(
     ):
     print(f'train_valid_split: {cfg.split}')
     if cfg.split == "time":
-        # trn_idx = train_df[train_df["f_1"].isin(59,60,61,62,63,64,65)].index
         trn_idx = train_df[train_df["f_1"] != 66].index
         val_idx = train_df[train_df["f_1"] == 66].index
         valid_df = train_df.iloc[val_idx]
@@ -768,22 +767,13 @@ def get_features(
         print('cumcount_encoding')
         cat_feats_to_encode = ["f_2", "f_4", "f_6", "f_13", "f_15", "f_18"] # high cardinality
 
-        # train_df["is_valid"] = 0 
-        # valid_df["is_valid"] = 1
-        
-        # train_df = train_df.sort_values(by=["f_1", "file_name", "f_0"]).reset_index(drop=True)
-        # valid_df = valid_df.sort_values(by=["f_1", "file_name", "f_0"]).reset_index(drop=True)
         train_df = train_df.sort_values(by=["f_1", "f_0"]).reset_index(drop=True)
 
         for col in cat_feats_to_encode: 
             train_df[f"cumcount_{col}"] = train_df.groupby([col]).cumcount()
             valid_df[f"cumcount_{col}"] = train_df[f"cumcount_{col}"].max()
             test_df[f"cumcount_{col}"] = train_df[f"cumcount_{col}"].max()
-        
-        # train_df = all_df[all_df["is_valid"] == 0].reset_index(drop=True)
-        # valid_df = all_df[all_df["is_valid"] == 1].reset_index(drop=True)
-        # del train_df["is_valid"]
-        # del valid_df["is_valid"]
+    
 
     if cfg.get('feat_cumcountv2', False): 
         print('feat_cumcountv2')
@@ -837,36 +827,7 @@ def get_features(
                 869 : 0
             }
         }
-        # f_9_dict = {
-        #     0 : {
-        #         869 : 0, 
-        #         21533 : 1
-        #     }, 
-        #     1 : {
-        #         21533 : 1, 
-        #         31372 : 2
-        #     },
-        #     2 : {
-        #         31372 : 2, 
-        #         6675 : 3
-        #     },
-        #     3 : {
-        #         6675 : 3, 
-        #         14659 : 4
-        #     },
-        #     4 : {
-        #         14659 : 4, # f_39에서 4, 5 뒤집어봄 6.16774 / f_39 2번째에서 3, 4로 내봄 (3하고 동일) 6.307815
-        #         9638 : 5
-        #     },
-        #     5 : {
-        #         9638 : 5, 
-        #         23218 : 6
-        #     },
-        #     6 : {
-        #         23218 : 6, 
-        #         869 : 0
-        #     }
-        # }
+
         train_df["week_of_days"] = train_df["f_1"] % 7
         valid_df["week_of_days"] = valid_df["f_1"] % 7
         test_df["week_of_days"] = test_df["f_1"] % 7
@@ -885,8 +846,6 @@ def get_features(
         valid_df.fillna(-1, inplace=True)
         test_df.fillna(-1, inplace=True)
     
-    # f_32~34 : delete_features : 6.121204 -> 6.12029
-    # 'f_7', 'f_7_count_full', 'f_9', 'f_11', 'f_43', 'f_51', 'f_58', 'f_59', 'f_64', 'f_65', 'f_66', 'f_67', 'f_68', 'f_69', 'f_70'
     features = [
         c for c in train_df.columns if c not in [
             'is_clicked', 'is_installed', 'file_name', 'f_0', 'f_1'
@@ -914,12 +873,6 @@ def get_dataloader(
         train_df.to_parquet(f'{cfg.save_dir}/{cfg.name}/train_df.parquet')
         valid_df.to_parquet(f'{cfg.save_dir}/{cfg.name}/valid_df.parquet')
         test_df.to_parquet(f'{cfg.save_dir}/{cfg.name}/test_df.parquet')
-
-    # if len(cfg.categorical_features) > 0: 
-    #     for col in cfg.categorical_features: 
-    #         train_df[col] = train_df[col].astype(float).astype(int)
-    #         valid_df[col] = valid_df[col].astype(float).astype(int)
-    #         test_df[col] = test_df[col].astype(float).astype(int)
 
     trn_lgb_data = lgb.Dataset(train_df[features], label=train_df[label_col])
     if cfg.get('sample_weight', False):

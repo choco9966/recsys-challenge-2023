@@ -32,7 +32,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import StratifiedKFold, train_test_split, GroupKFold
 
 from data.common import *
-from models.common import *
 from sklearn.metrics import log_loss
 import random 
 import lightgbm as lgb
@@ -53,30 +52,8 @@ def predict_each_fold(cfg, train_df, valid_df, test_df, is_feat_eng=True, params
                 'is_clicked', 'is_installed', 'file_name', 'f_0', 'f_1', 'f_7', 'f_7_count_full', 'f_9', 'f_11', 'f_43', 'f_51', 'f_58', 'f_59', 'f_64', 'f_65', 'f_66', 'f_67', 'f_68', 'f_69', 'f_70'
                 ]  + cfg.delete_features
             ]
-
-    # features = [c for c in features if c not in ["f_2", "f_3", "f_4", "f_6", "f_15"]]
-
-    if cfg.get('remove_first_day', False):
-        print("before remove first day : ", train_df.shape)
-        train_df = train_df[train_df["f_1"] > 45].reset_index(drop=True)
-        print("after remove first day : ", train_df.shape)
-
-    if cfg.get('valid_period', False):
-        train_df = pd.concat([train_df, valid_df], axis=0)
-        valid_df = train_df[train_df["f_1"] >= cfg.valid_period].reset_index(drop=True)
-        train_df = train_df[train_df["f_1"] < cfg.valid_period].reset_index(drop=True)
-    
-    if cfg.get('valid_periodv2', False):
-        train_df = pd.concat([train_df, valid_df], axis=0)
-        valid_df = train_df[train_df["f_1"] == cfg.valid_periodv2].reset_index(drop=True)
-        train_df = train_df[train_df["f_1"] != cfg.valid_periodv2].reset_index(drop=True)
-
-    if cfg.get('valid_periodv3', False):
-        train_df = pd.concat([train_df, valid_df], axis=0)
-        valid_df = train_df[train_df["f_1"] == cfg.valid_periodv3].reset_index(drop=True)
             
     # get dataloader
-    features = features
     trn_lgb_data, val_lgb_data = get_dataloader(
         cfg, 
         train_df=train_df,
@@ -86,10 +63,7 @@ def predict_each_fold(cfg, train_df, valid_df, test_df, is_feat_eng=True, params
         label_col=cfg.label_col
         )
     
-    # num_negs = np.sum(train_df['is_installed']==0)
-    # num_pos = np.sum(train_df['is_installed']==1)
     
-    # params['scale_pos_weight'] = 10
     # get model 
     evals = {}
     params["random_state"] = cfg.seed
@@ -184,113 +158,6 @@ def main():
         subs = clf.predict(test_df[features].reset_index(drop=True))
         score = logs['Valid Loss']
 
-        if cfg.get('use_train_valid', False):
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_only_train.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-        if cfg.get('use_train_valid', False):
-            # valid_df 까지 써서 학습
-            print('clf.best_iteration_', clf.current_iteration())
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration(),
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv1.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-            print('clf.best_iteration_', clf.current_iteration())
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration() - 2000,
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv2.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-            print('clf.best_iteration_', clf.current_iteration())
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration() - 1500,
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv3.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-            print('clf.best_iteration_', clf.current_iteration())
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration() - 1000,
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv4.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-            print('clf.best_iteration_', clf.current_iteration() + 1000)
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration(),
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv5.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
-
-            print('clf.best_iteration_', clf.current_iteration())
-            train_valid_df = pd.concat([train_df, valid_df], axis=0).reset_index(drop=True)
-            train_valid_lgb_data = lgb.Dataset(train_valid_df[features], train_valid_df[cfg.label_col])
-            clf = lgb.train(
-                params, train_valid_lgb_data, clf.current_iteration() + 2000,
-            )
-            subs = clf.predict(test_df[features].reset_index(drop=True))
-            submission = pd.DataFrame() 
-            submission["row_id"] = test_df["f_0"]
-            submission["is_clicked"] = subs
-            submission["is_installed"] = subs
-            save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-            if cfg.get('use_train_valid', False):
-                save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_validv6.csv'
-            submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)            
-
-        score = logs['Valid Loss']
     else: 
         trn_idx = train_df[train_df["f_1"] != 66].index
         val_idx = train_df[train_df["f_1"] == 66].index
@@ -340,8 +207,6 @@ def main():
     submission["is_clicked"] = subs
     submission["is_installed"] = subs
     save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}.csv'
-    if cfg.get('use_train_valid', False):
-        save_file = 'submission' + f'(cfg_{cfg.name})_cv{score}_split{cfg.split}_with_valid.csv'
     submission.to_csv(f'{cfg.save_dir}/{cfg.name}/{save_file}', sep ='\t', index=False)
 
 def parse_arguments():
